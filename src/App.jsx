@@ -1,32 +1,138 @@
+import React, { createContext, useState, useEffect, Suspense, lazy } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import axios from "axios";
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+
+// Configure Axios globally to pass HttpOnly cookies automatically on every request
+axios.defaults.withCredentials = true;
+
 import Footer from "./components/Footer";
 import Header from "./components/Header";
-import Content from "./components/Content";
-import Login from "./components/Login";
-import Logout from "./components/Logout";
-import Register from "./components/Register";
-import Cart from "./components/Cart";
-import Orders from "./components/Orders";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { createContext, useState } from "react";
+import ChatWidget from "./components/ChatWidget";
+
+// Lazy loaded route components for better performance
+const Content = lazy(() => import("./components/Content"));
+const Login = lazy(() => import("./components/Login"));
+const Logout = lazy(() => import("./components/Logout"));
+const Register = lazy(() => import("./components/Register"));
+const Cart = lazy(() => import("./components/Cart"));
+const Orders = lazy(() => import("./components/Orders"));
+const Profile = lazy(() => import("./components/Profile"));
+
 export const AppContext = createContext();
+
 function App() {
-  const [user, setUser] = useState({});
-  const [cart, setCart] = useState([]);
+  // Restore user from localStorage on initial load
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem("user");
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  // Restore cart from localStorage on initial load
+  const [cart, setCart] = useState(() => {
+    const saved = localStorage.getItem("cart");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Persist user state to localStorage securely (never store token here)
+  useEffect(() => {
+    const userToSave = { ...user };
+    if (userToSave.token) {
+      delete userToSave.token;
+    }
+    localStorage.setItem("user", JSON.stringify(userToSave));
+  }, [user]);
+
+  // Synchronize user profile with backend on initial load
+  useEffect(() => {
+    if (user?.email) {
+      axios.get(`${import.meta.env.VITE_API_URL}/users/me`)
+        .then(res => {
+          if (res.data) setUser(prev => ({ ...prev, ...res.data }));
+        })
+        .catch(err => {
+          if (err.response?.status === 401 || err.response?.status === 404) {
+            setUser({});
+            localStorage.removeItem("user");
+          }
+        });
+    }
+  }, []); // Run only once on mount
+
+  // Persist cart state to localStorage
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  // Axios Interceptor for Security (JWT) and Global Config
+  useEffect(() => {
+    const interceptor = axios.interceptors.request.use(
+      (config) => {
+        if (user?.token) {
+          config.headers.Authorization = `Bearer ${user.token}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+    return () => axios.interceptors.request.eject(interceptor);
+  }, [user]);
+
   return (
     <AppContext.Provider value={{ user, setUser, cart, setCart }}>
-      <BrowserRouter>
-        <Header />
-        <Routes>
-          <Route index element={<Content />} />
-          <Route path="cart" element={<Cart />} />
-          <Route path="orders" element={<Orders />} />
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-          <Route path="logout" element={<Logout />} />
-        </Routes>
-        <Footer />
-      </BrowserRouter>
+      <SkeletonTheme baseColor="#f1f5f9" highlightColor="#ffffff" borderRadius="0.5rem" duration={1.2}>
+        <BrowserRouter>
+          <LayoutWrapper user={user} setUser={setUser} cart={cart} setCart={setCart} />
+        </BrowserRouter>
+      </SkeletonTheme>
     </AppContext.Provider>
   );
 }
+
+// Global Skeleton Loader for Suspense Fallback
+function LoadingFallback() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+      <Skeleton width="20%" height={24} className="mb-4 rounded-lg" />
+      <Skeleton count={5} height={60} className="mb-4 rounded-xl" />
+    </div>
+  );
+}
+
+function LayoutWrapper({ user, setUser, cart, setCart }) {
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <ConditionalHeader />
+      <main className="flex-1 flex flex-col">
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route index element={<Content />} />
+            <Route path="cart" element={<Cart />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="logout" element={<Logout />} />
+          </Routes>
+        </Suspense>
+      </main>
+      <ConditionalFooter />
+      <ChatWidget />
+    </div>
+  );
+}
+
+function ConditionalHeader() {
+  const { pathname } = useLocation();
+  if (["/login", "/register"].includes(pathname)) return null;
+  return <Header />;
+}
+
+function ConditionalFooter() {
+  const { pathname } = useLocation();
+  if (["/login", "/register"].includes(pathname)) return null;
+  return <Footer />;
+}
+
 export default App;
