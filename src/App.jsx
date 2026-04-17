@@ -24,7 +24,10 @@ export const AppContext = createContext();
 
 function App() {
   // Restore user from localStorage on initial load
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem("user");
+    return saved ? JSON.parse(saved) : {};
+  });
 
   // Restore cart from localStorage on initial load
   const [cart, setCart] = useState(() => {
@@ -32,18 +35,30 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Check auth status on mount
+  // Check auth status on mount to sync with backend
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_URL}/users/me`)
       .then(res => {
-        if (res.data) setUser(res.data);
-        else setUser({});
+        if (res.data) {
+          setUser(res.data);
+          localStorage.setItem("user", JSON.stringify(res.data));
+        }
       })
-      .catch(() => {
-        setUser({});
-        localStorage.removeItem("user");
+      .catch((err) => {
+        // Only logout if the server explicitly says the session is dead (401)
+        if (err.response?.status === 401) {
+          setUser({});
+          localStorage.removeItem("user");
+        }
       });
-  }, []); // Run absolutely once on load
+  }, []); 
+
+  // Persist user state to localStorage
+  useEffect(() => {
+    if (user && Object.keys(user).length > 0) {
+      localStorage.setItem("user", JSON.stringify(user));
+    }
+  }, [user]);
 
   // Persist cart state to localStorage
   useEffect(() => {
