@@ -26,7 +26,7 @@ function App() {
   // Restore user from localStorage on initial load
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("user");
-    return saved ? JSON.parse(saved) : {};
+    return saved ? JSON.parse(saved) : null;
   });
 
   // Restore cart from localStorage on initial load
@@ -37,23 +37,27 @@ function App() {
 
   // Check auth status on mount to sync with backend
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/users/me`)
+    // If we have a token in memory, use it to verify the session
+    const config = user?.token ? { headers: { Authorization: `Bearer ${user.token}` } } : {};
+    
+    axios.get(`${import.meta.env.VITE_API_URL}/users/me`, config)
       .then(res => {
         if (res.data) {
-          setUser(res.data);
-          localStorage.setItem("user", JSON.stringify(res.data));
+          // Keep the token we used to get in
+          const updatedUser = { ...res.data, token: user?.token || res.data.token };
+          setUser(updatedUser);
+          localStorage.setItem("user", JSON.stringify(updatedUser));
         }
       })
       .catch((err) => {
-        // Only logout if the server explicitly says the session is dead (401)
         if (err.response?.status === 401) {
-          setUser({});
+          setUser(null);
           localStorage.removeItem("user");
         }
       });
   }, []); 
 
-  // Persist user state to localStorage
+  // Persist user state to localStorage (INCLUDING TOKEN for iPhone support)
   useEffect(() => {
     if (user && Object.keys(user).length > 0) {
       localStorage.setItem("user", JSON.stringify(user));
