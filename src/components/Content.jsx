@@ -76,7 +76,7 @@ function ProductCard({ product, inCart, onAdd, onIncrement, onDecrement, index }
           </div>
         )}
         <motion.img
-          src={`${import.meta.env.VITE_API_URL}${product.imageUrl}`}
+          src={product.imageUrl?.startsWith("http") ? product.imageUrl : `${import.meta.env.VITE_API_URL}${product.imageUrl}`}
           alt={product.name}
           className="w-full h-full object-cover relative z-10"
           style={{ opacity: imgLoaded ? 1 : 0, transition: 'opacity 0.4s ease-in-out' }}
