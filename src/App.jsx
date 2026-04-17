@@ -24,10 +24,7 @@ export const AppContext = createContext();
 
 function App() {
   // Restore user from localStorage on initial load
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("user");
-    return saved ? JSON.parse(saved) : {};
-  });
+  const [user, setUser] = useState(null);
 
   // Restore cart from localStorage on initial load
   const [cart, setCart] = useState(() => {
@@ -35,30 +32,18 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Persist user state to localStorage securely (never store token here)
+  // Check auth status on mount
   useEffect(() => {
-    const userToSave = { ...user };
-    if (userToSave.token) {
-      delete userToSave.token;
-    }
-    localStorage.setItem("user", JSON.stringify(userToSave));
-  }, [user]);
-
-  // Synchronize user profile with backend on initial load
-  useEffect(() => {
-    if (user?.email) {
-      axios.get(`${import.meta.env.VITE_API_URL}/users/me`)
-        .then(res => {
-          if (res.data) setUser(prev => ({ ...prev, ...res.data }));
-        })
-        .catch(err => {
-          if (err.response?.status === 401 || err.response?.status === 404) {
-            setUser({});
-            localStorage.removeItem("user");
-          }
-        });
-    }
-  }, []); // Run only once on mount
+    axios.get(`${import.meta.env.VITE_API_URL}/users/me`)
+      .then(res => {
+        if (res.data) setUser(res.data);
+        else setUser({});
+      })
+      .catch(() => {
+        setUser({});
+        localStorage.removeItem("user");
+      });
+  }, []); // Run absolutely once on load
 
   // Persist cart state to localStorage
   useEffect(() => {
