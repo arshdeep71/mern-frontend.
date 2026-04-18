@@ -305,65 +305,7 @@ function HeroBanner({ user, searchQuery, onSearch, cart, orders }) {
 
   return (
     <div>
-      {/* Mobile top bar — search + bell only */}
-      <div className="sm:hidden flex items-center gap-3 px-4 pt-3 pb-2">
-        {/* Search bar — FUNCTIONAL */}
-        <div className="flex-1 relative">
-          <div className="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
-            <SearchIcon />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={e => onSearch(e.target.value)}
-            placeholder="Search products…"
-            className="w-full bg-slate-100 rounded-full py-2.5 pl-9 pr-9 text-[13px] text-slate-700 placeholder:text-slate-400 outline-none border-none"
-          />
-          <AnimatePresence>
-            {searchQuery && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                onClick={() => onSearch("")}
-                className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600"
-              >
-                <XIcon />
-              </motion.button>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Notification bell with dropdown */}
-        <div className="relative flex-shrink-0" ref={notifRef}>
-          <button
-            onClick={() => setNotifOpen(v => !v)}
-            className="w-10 h-10 rounded-2xl flex items-center justify-center bg-slate-100 text-slate-600 relative hover:bg-slate-200 transition"
-          >
-            <BellIcon />
-            {unreadCount > 0 && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute top-1 right-1 min-w-[16px] h-4 bg-indigo-600 text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 border-2 border-white"
-              >
-                {unreadCount}
-              </motion.span>
-            )}
-          </button>
-
-          <AnimatePresence>
-            {notifOpen && (
-              <NotificationPanel
-                onClose={() => setNotifOpen(false)}
-                cart={cart}
-                orders={orders}
-              />
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-
+      {/* Show search results header if searching */}
       {/* Show search results header if searching */}
       {searchQuery && (
         <div className="sm:hidden px-4 pb-2">
