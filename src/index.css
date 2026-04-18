@@ -10,6 +10,25 @@
     box-sizing: border-box;
   }
 
+  /* ── Fullscreen PWA root ── */
+  html, body, #root {
+    height: 100%;
+    /* Use dynamic viewport height — accounts for browser chrome appearing/disappearing */
+    min-height: 100dvh;
+    overscroll-behavior: none; /* Prevent pull-to-refresh & bounce */
+  }
+
+  /* Prevent iOS rubber-band scroll on the html element */
+  html {
+    overflow: hidden;
+    height: 100%;
+  }
+
+  body {
+    overflow-y: auto;
+    height: 100%;
+  }
+
   body {
     @apply font-sans antialiased text-slate-900;
     background-color: #F0F2F7;

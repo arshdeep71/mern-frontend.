@@ -2,9 +2,45 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-    <title>mern-frontend</title>
+
+    <!-- ── Core Viewport ── -->
+    <!-- viewport-fit=cover: content extends under notch/Dynamic Island/home bar -->
+    <!-- maximum-scale=1: prevent iOS auto-zoom on input focus -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+
+    <!-- ── PWA Manifest ── -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- ── Theme Colors ── -->
+    <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1e1b4b" media="(prefers-color-scheme: dark)" />
+
+    <!-- ── iOS Safari Fullscreen (Add to Home Screen) ── -->
+    <!-- Hides Safari browser chrome when launched from home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MyStore" />
+
+    <!-- ── iOS Touch Icons ── -->
+    <link rel="apple-touch-icon" href="/icon-512.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
+
+    <!-- ── iOS Splash Screen color ── -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- ── Android / General ── -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="MyStore" />
+
+    <!-- ── SEO ── -->
+    <meta name="description" content="MyStore — Premium shopping experience for electronics, accessories & more. Shop anytime, anywhere." />
+    <meta name="robots" content="index, follow" />
+
+    <!-- ── Favicon ── -->
+    <link rel="icon" type="image/png" href="/icon-192.png" />
+
+    <title>MyStore</title>
   </head>
   <body>
     <div id="root"></div>

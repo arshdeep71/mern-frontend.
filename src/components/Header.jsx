@@ -46,7 +46,7 @@ function Header() {
   if (user?.email) navLinks.push({ name: "Orders", path: "/orders" });
 
   return (
-    <header className="glass">
+    <header className="glass" style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
