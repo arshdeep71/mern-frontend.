@@ -534,7 +534,7 @@ export default function Content() {
   return (
     <>
       {/* ── MOBILE LAYOUT ── */}
-      <div className="sm:hidden pb-36">
+      <div className="sm:hidden">
         <HeroBanner
           user={user}
           searchQuery={searchQuery}
@@ -618,6 +618,13 @@ export default function Content() {
             </div>
           )}
         </div>
+
+        {/* 
+          ── FULLSCREEN SPACER ── 
+          Allows scrolling the last items above the floating nav 
+          without creating a colored empty block.
+        */}
+        <div style={{ height: "calc(env(safe-area-inset-bottom, 0px) + 120px)" }} />
       </div>
 
       {/* ── DESKTOP LAYOUT (unchanged) ── */}
