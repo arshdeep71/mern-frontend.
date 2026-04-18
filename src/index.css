@@ -9,7 +9,7 @@
     box-sizing: border-box;
   }
 
-  /* 🔥 STEP 2 — FIX ROOT STRUCTURE */
+  /* ───── 1. REMOVE ALL HEIGHT LOCKS ───── */
   html, body {
     margin: 0;
     padding: 0;
@@ -21,7 +21,7 @@
   }
 
   #root {
-    min-height: 100vh;
+    min-height: 100%;
     background: #F4F6FB;
   }
 
@@ -32,20 +32,19 @@
     letter-spacing: -0.01em;
   }
 
-  /* 🔥 STEP 7 — ADD EXTRA SAFETY LAYER 
-     This covers aggressive Safari bounce at the absolute bottom */
+  /* ───── 4. EXTRA SAFETY LAYER FOR BOUNCE ───── */
   body::after {
     content: "";
     position: fixed;
-    bottom: -200px;
+    bottom: -300px; /* Precise deep-offset */
     left: 0;
     width: 100%;
-    height: 300px;
+    height: 400px;
     background: #F4F6FB;
     z-index: -1;
   }
 
-  /* ───── NIXON SCROLL CLASSES ───── */
+  /* ───── 3. SCROLL EXTENSION (CRITICAL) ───── */
   .app-container {
     min-height: 100%;
     display: flex;
@@ -53,22 +52,20 @@
     background: #F4F6FB;
   }
 
-  /* 🔥 STEP 4 — FORCE CONTINUOUS SCROLL AREA
-     Ensures Safari never reaches "end of painted content" */
   .app-container::after {
     content: "";
     display: block;
-    height: 220px; /* Taller spacer for floating pill */
+    height: 250px; /* Extended scroll room */
     background: #F4F6FB;
   }
 
-  /* 🔥 STEP 5 — FIX MAIN CONTENT */
+  /* ───── 6. PREVENT CONTENT OVERLAP ───── */
   .main-content {
     flex: 1;
-    padding-bottom: 20px;
+    padding-bottom: 140px; /* Ample space for floating nav */
   }
 
-  /* ── iOS Safari anti-zoom fix ── */
+  /* iOS Safari anti-zoom fix */
   input, textarea, select {
     font-size: 16px !important;
   }

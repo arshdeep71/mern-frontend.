@@ -101,17 +101,24 @@ export default function MobileNav() {
   ];
 
   return (
+    /**
+     * 🔥 STEP 5 — FLOATING NAVBAR (NOT ATTACHED)
+     * Keeps the premium pill look while floating precisely.
+     */
     <div
-      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none"
+      className="sm:hidden fixed z-50 pointer-events-none"
       style={{
-        paddingBottom: "max(env(safe-area-inset-bottom, 0px), 12px)",
+        bottom: "calc(env(safe-area-inset-bottom, 0px) + 20px)",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "max-content",
       }}
     >
       {/* ── Liquid Glass Floating Pill ── */}
       <motion.div
         animate={scrolled ? { scale: 0.88, opacity: 0.85 } : { scale: 1, opacity: 1 }}
         transition={{ type: "spring", damping: 28, stiffness: 320 }}
-        className="pointer-events-auto relative shadow-2xl flex items-center px-1.5 py-1.5 gap-0.5"
+        className="pointer-events-auto shadow-2xl flex items-center px-1.5 py-1.5 gap-0.5"
         style={{
           background: "rgba(255, 255, 255, 0.85)",
           backdropFilter: "blur(20px) saturate(160%)",
