@@ -102,30 +102,17 @@ export default function MobileNav() {
 
   return (
     /**
-     * Floating Pill Navigation — Transparent container allows content bleed
+     * 🔥 STEP 6 — FIX YOUR BOTTOM NAV
+     * Standard fixed bar with reliable safe-area handling.
      */
     <div
-      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none"
+      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100"
       style={{
-        /* Floating position above the home indicator */
-        paddingBottom: "max(env(safe-area-inset-bottom, 0px), 12px)",
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
-      {/* ── Liquid Glass Floating Pill ── */}
-      <motion.div
-        animate={scrolled ? { scale: 0.88, opacity: 0.85 } : { scale: 1, opacity: 1 }}
-        transition={{ type: "spring", damping: 28, stiffness: 320 }}
-        className="pointer-events-auto relative shadow-2xl flex items-center px-1.5 py-1.5 gap-0.5"
-        style={{
-          /* Liquid Glass Material */
-          background: "rgba(255, 255, 255, 0.85)",
-          backdropFilter: "blur(20px) saturate(160%)",
-          WebkitBackdropFilter: "blur(20px) saturate(160%)",
-          borderRadius: "999px",
-          border: "1px solid rgba(255, 255, 255, 0.4)",
-          boxShadow: "0 8px 32px -4px rgba(0,0,0,0.1), 0 4px 12px -2px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.8)",
-        }}
-      >
+      {/* Tab row */}
+      <div className="flex items-center justify-around px-2 h-[70px]">
         {tabs.map(({ label, path, key, badge }) => {
           const active =
             location.pathname === path ||
