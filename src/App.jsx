@@ -97,8 +97,42 @@ function App() {
   );
 }
 
+function CookieBanner() {
+  const [show, setShow] = useState(() => !localStorage.getItem("cookies_accepted"));
+  if (!show) return null;
+
+  const accept = () => {
+    localStorage.setItem("cookies_accepted", "true");
+    setShow(false);
+  };
+
+  return (
+    <motion.div
+      initial={{ y: 100 }}
+      animate={{ y: 0 }}
+      className="fixed bottom-0 left-0 right-0 z-[2000] p-4 md:p-6"
+    >
+      <div className="max-w-7xl mx-auto bg-white shadow-[0_-20px_60px_rgba(0,0,0,0.1)] border border-slate-100 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex-1 space-y-2 text-left">
+          <h3 className="text-xl font-bold text-slate-900">We value your privacy</h3>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            We use cookies and other technologies to personalize your experience, perform marketing, and collect analytics. Learn more in our <Link to="/" className="underline font-medium hover:text-black">Privacy Policy.</Link>
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+          <button onClick={() => setShow(false)} className="text-sm font-bold underline hover:text-indigo-600">Manage preferences</button>
+          <button onClick={accept} className="flex-1 md:flex-none h-12 px-10 border-2 border-slate-900 font-bold uppercase tracking-widest hover:bg-slate-50 transition-all">Accept</button>
+          <button onClick={() => setShow(false)} className="flex-1 md:flex-none h-12 px-10 border-2 border-slate-200 text-slate-400 font-bold uppercase tracking-widest hover:border-slate-900 hover:text-slate-900 transition-all">Decline</button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function NewsletterPopup() {
   const [show, setShow] = useState(false);
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [dismissed, setDismissed] = useState(sessionStorage.getItem("newsletter_dismissed"));
 
   useEffect(() => {
@@ -107,16 +141,32 @@ function NewsletterPopup() {
     return () => clearTimeout(timer);
   }, [dismissed]);
 
+  const validate = () => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(email)) {
+      setError("Your Email is in an invalid format.");
+      return false;
+    }
+    return true;
+  };
+
   const close = () => {
     setShow(false);
     sessionStorage.setItem("newsletter_dismissed", "true");
     setDismissed("true");
   };
 
+  const submit = () => {
+    if (validate()) {
+      alert("Subscription successful!");
+      close();
+    }
+  };
+
   return (
     <AnimatePresence>
       {show && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -128,28 +178,61 @@ function NewsletterPopup() {
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            className="relative w-full max-w-lg bg-white p-10 shadow-2xl overflow-hidden"
+            className="relative w-full max-w-lg bg-white p-8 md:p-12 shadow-2xl"
           >
             <button onClick={close} className="absolute top-4 right-4 text-slate-400 hover:text-black">
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
-            <div className="text-center space-y-6">
-               <h2 className="text-3xl font-black text-slate-900 leading-tight">
-                 Before you go, subscribe to get <span className="text-indigo-600">10% OFF</span> your first order.
+
+            {/* 🔥 Red Validation Error Box (Image 1) */}
+            <AnimatePresence>
+              {error && (
+                <motion.div 
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="mb-6 overflow-hidden"
+                >
+                  <div className="border border-black p-4 flex items-center justify-between text-red-500 font-medium text-sm">
+                    <span>{error}</span>
+                    <button onClick={() => setError("")} className="font-black text-xs hover:scale-120 transition-transform">X</button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="text-center space-y-8">
+               <h2 className="text-4xl md:text-5xl font-serif text-slate-900 leading-[1.1]">
+                 Want <span className="italic">10% OFF</span> your first order?
                </h2>
+               
+               <p className="text-sm md:text-base text-slate-500 leading-relaxed max-w-sm mx-auto">
+                 Enter your email address and phone number to receive 10% off your first order and stay in the know.
+               </p>
+
                <div className="space-y-4 pt-4">
                  <input 
                    type="email" 
+                   value={email}
+                   onChange={(e) => setEmail(e.target.value)}
                    placeholder="Email" 
-                   className="w-full h-14 px-6 bg-slate-100 border-none rounded-sm text-lg focus:ring-2 focus:ring-black outline-none"
+                   className="w-full h-14 px-6 border border-slate-300 rounded-sm text-lg focus:border-black outline-none transition-all"
                  />
-                 <button className="w-full h-14 bg-black text-white font-bold uppercase tracking-[0.2em] hover:bg-slate-800 transition-colors">
+                 <button 
+                   onClick={submit}
+                   className="w-full h-16 border-2 border-black bg-white text-black font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all text-lg"
+                 >
                    Submit & continue
                  </button>
                </div>
-               <button onClick={close} className="text-slate-400 font-medium hover:text-black hover:underline transition-all">
+               
+               <button onClick={close} className="text-slate-900 font-bold uppercase tracking-widest text-xs hover:underline">
                  No thanks
                </button>
+
+               <p className="text-[10px] text-slate-400 pt-6 uppercase tracking-widest font-bold">
+                 Cannot be combined with other offers, some exclusions apply.
+               </p>
             </div>
           </motion.div>
         </div>
@@ -172,6 +255,7 @@ function LayoutWrapper({ user, setUser, cart, setCart }) {
   return (
     <div className="app-container">
       <NewsletterPopup />
+      <CookieBanner />
       <ConditionalHeader />
       <main className="main-content">
         <Suspense fallback={<LoadingFallback />}>
