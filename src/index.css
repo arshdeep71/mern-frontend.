@@ -180,3 +180,13 @@
     0 8px 24px rgba(0,0,0,0.06),
     0 32px 80px rgba(0,0,0,0.04);
 }
+
+/* ── Mobile utilities ── */
+/* Hide scrollbar for horizontal flash-deals strip */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Smooth inertia scroll on iOS */
+.scroll-touch { -webkit-overflow-scrolling: touch; }
+
+/* Mobile main content padding (above bottom nav) — applied via Tailwind pb-28 */

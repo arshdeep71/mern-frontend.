@@ -10,6 +10,7 @@ axios.defaults.withCredentials = true;
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ChatWidget from "./components/ChatWidget";
+import MobileNav from "./components/MobileNav";
 
 // Lazy loaded route components for better performance
 const Content = lazy(() => import("./components/Content"));
@@ -121,7 +122,12 @@ function LayoutWrapper({ user, setUser, cart, setCart }) {
           </Routes>
         </Suspense>
       </main>
-      <ConditionalFooter />
+      {/* Desktop footer — hidden on mobile */}
+      <div className="hidden sm:block">
+        <ConditionalFooter />
+      </div>
+      {/* Mobile bottom nav */}
+      <MobileNav />
       <ChatWidget />
     </div>
   );

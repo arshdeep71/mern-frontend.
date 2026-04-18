@@ -3,56 +3,113 @@ import { AppContext } from "../App";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { gsap } from "gsap";
 import axios from "axios";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+import ProductDetailModal from "./ProductDetailModal";
 
-// ── Inline SVG icons ──
+// ── Icons ──
 const CartIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
   </svg>
 );
 const CheckIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12"/>
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+const SearchIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+const BellIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </svg>
+);
+const ChevronRight = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="9 18 15 12 9 6" />
+  </svg>
+);
+const CameraIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+    <circle cx="12" cy="13" r="4" />
   </svg>
 );
 
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
+// ── Categories data ──
+const categories = [
+  { label: "Mobile",    emoji: "📱", color: "#f0f4ff" },
+  { label: "Headphone", emoji: "🎧", color: "#f5f0ff" },
+  { label: "Tablets",   emoji: "📟", color: "#fff0f5" },
+  { label: "Laptop",    emoji: "💻", color: "#f0fff4" },
+  { label: "Speakers",  emoji: "🔊", color: "#fff8f0" },
+  { label: "More",      emoji: "⋯",  color: "#f0f8ff" },
+];
+
+// ── Hero slides data ──
+const heroSlides = [
+  {
+    title: "iPhone 16 Pro",
+    subtitle: "Extraordinary Visual\n& Exceptional Power",
+    btn: "Shop Now",
+    bg: "linear-gradient(135deg, #1a1aff 0%, #3b3bff 40%, #6b6bff 100%)",
+    accent: "#fff",
+  },
+  {
+    title: "Galaxy S25 Ultra",
+    subtitle: "Next Level AI\nCamera Experience",
+    btn: "Explore",
+    bg: "linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #334155 100%)",
+    accent: "#38bdf8",
+  },
+  {
+    title: "AirPods Pro 3",
+    subtitle: "Active Noise Cancel\nCrystal Clear Sound",
+    btn: "Listen Now",
+    bg: "linear-gradient(135deg, #064e3b 0%, #065f46 40%, #047857 100%)",
+    accent: "#6ee7b7",
+  },
+];
 
 // ── Skeleton card ──
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)" }}>
-      <div className="aspect-square relative flex items-center justify-center bg-slate-50">
-        <div className="absolute inset-0">
-          <Skeleton height="100%" borderRadius={0} />
-        </div>
+    <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden flex-shrink-0 w-44 sm:w-auto" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+      <div className="w-full" style={{ aspectRatio: "1/1" }}>
+        <Skeleton height="100%" borderRadius={0} />
       </div>
-      <div className="p-5">
-        <Skeleton width="30%" height={10} className="mb-3" />
-        <Skeleton width="90%" height={14} className="mb-1" />
-        <Skeleton width="65%" height={14} className="mb-4" />
-        <div className="flex justify-between items-center mt-4">
-          <div>
-            <Skeleton width={40} height={10} className="mb-1 block" />
-            <Skeleton width={60} height={18} />
-          </div>
-          <Skeleton width={90} height={34} borderRadius={9999} />
+      <div className="p-3">
+        <Skeleton width="60%" height={10} className="mb-2" />
+        <Skeleton width="90%" height={13} className="mb-1" />
+        <div className="flex justify-between items-center mt-3">
+          <Skeleton width={50} height={16} />
+          <Skeleton width={60} height={28} borderRadius={9999} />
         </div>
       </div>
     </div>
   );
 }
 
-// ── Animated product card ──
-function ProductCard({ product, inCart, onAdd, onIncrement, onDecrement, index }) {
+// ── Product Card ──
+function ProductCard({ product, inCart, onAdd, onIncrement, onDecrement, index, onDetail, API_URL }) {
   const [justAdded, setJustAdded] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const inView = useInView(ref, { once: true, margin: "-40px" });
 
-  const handleAdd = () => {
+  const imgSrc = product.imageUrl?.startsWith("data:")
+    ? product.imageUrl
+    : product.imageUrl?.startsWith("http")
+      ? `${API_URL}/proxy/image?url=${encodeURIComponent(product.imageUrl)}`
+      : `${API_URL}${product.imageUrl}`;
+
+  const handleAdd = (e) => {
+    e.stopPropagation();
     onAdd(product);
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), 1800);
@@ -61,77 +118,48 @@ function ProductCard({ product, inCart, onAdd, onIncrement, onDecrement, index }
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 32 }}
+      initial={{ opacity: 0, y: 28 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -4 }}
-      className="group bg-white rounded-2xl border border-slate-100 overflow-hidden cursor-default"
+      transition={{ duration: 0.45, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
+      onClick={() => onDetail(product)}
+      className="group bg-white rounded-2xl border border-slate-100 overflow-hidden cursor-pointer"
       style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)" }}
     >
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-slate-50">
+      <div className="relative overflow-hidden bg-slate-50" style={{ aspectRatio: "1/1" }}>
         {!imgLoaded && (
-          <div className="absolute inset-0 z-0">
-            <Skeleton height="100%" borderRadius={0} />
-          </div>
+          <div className="absolute inset-0 z-0"><Skeleton height="100%" borderRadius={0} /></div>
         )}
         <motion.img
-          src={
-            product.imageUrl?.startsWith("data:") 
-              ? product.imageUrl 
-              : product.imageUrl?.startsWith("http") 
-                ? `${import.meta.env.VITE_API_URL}/proxy/image?url=${encodeURIComponent(product.imageUrl)}` 
-                : `${import.meta.env.VITE_API_URL}${product.imageUrl}`
-          }
+          src={imgSrc}
           alt={product.name}
           className="w-full h-full object-cover relative z-10"
-          style={{ opacity: imgLoaded ? 1 : 0, transition: 'opacity 0.4s ease-in-out' }}
+          style={{ opacity: imgLoaded ? 1 : 0, transition: "opacity 0.4s ease-in-out" }}
           onLoad={() => setImgLoaded(true)}
           whileHover={{ scale: 1.06 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.5 }}
           loading="lazy"
         />
-        {/* New badge */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: index * 0.06 + 0.3 }}
-          className="absolute top-3 left-3"
-        >
-          <span className="bg-white/90 backdrop-blur-sm text-indigo-600 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm border border-white/80">
-            New
-          </span>
-        </motion.div>
-        {/* In-cart overlay badge */}
-        <AnimatePresence>
-          {inCart && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute top-3 right-3 w-7 h-7 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg shadow-indigo-200"
-            >
-              <CheckIcon />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Badge */}
+        <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-indigo-600 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide shadow-sm border border-white/80">
+          New
+        </span>
+        {inCart && (
+          <div className="absolute top-2 right-2 w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+            <CheckIcon />
+          </div>
+        )}
       </div>
 
       {/* Info */}
-      <div className="p-5">
-        <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Premium</span>
-        <h3 className="font-semibold text-slate-800 text-[15px] mt-1 group-hover:text-indigo-600 transition-colors duration-200 truncate leading-tight">
+      <div className="p-3 sm:p-4">
+        <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest">Premium</span>
+        <h3 className="font-semibold text-slate-800 text-[13px] mt-0.5 group-hover:text-indigo-600 transition-colors truncate leading-tight">
           {product.name}
         </h3>
-        <p className="text-slate-400 text-[12px] mt-1.5 line-clamp-2 leading-relaxed min-h-[36px]">
-          {product.desc}
-        </p>
 
-        <div className="mt-5 flex items-center justify-between">
-          <div>
-            <span className="text-[10px] text-slate-400 font-medium">Price</span>
-            <p className="text-[18px] font-bold text-slate-900 tracking-tight">₹{product.price}</p>
-          </div>
+        <div className="mt-3 flex items-center justify-between">
+          <p className="text-[15px] font-bold text-slate-900">₹{product.price}</p>
 
           <AnimatePresence mode="wait">
             {inCart ? (
@@ -140,19 +168,15 @@ function ProductCard({ product, inCart, onAdd, onIncrement, onDecrement, index }
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2 }}
-                className="flex items-center gap-1 bg-indigo-50 border border-indigo-100 rounded-full px-1 py-0.5"
+                onClick={e => e.stopPropagation()}
+                className="flex items-center gap-0.5 bg-indigo-50 border border-indigo-100 rounded-full px-0.5 py-0.5"
               >
-                <motion.button
-                  whileTap={{ scale: 0.85 }}
-                  onClick={() => onDecrement(product._id)}
-                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white hover:shadow-sm text-indigo-600 font-bold transition-all text-lg leading-none"
+                <motion.button whileTap={{ scale: 0.8 }} onClick={(e) => { e.stopPropagation(); onDecrement(product._id); }}
+                  className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white text-indigo-600 font-bold text-base leading-none"
                 >−</motion.button>
-                <span className="w-6 text-center text-sm font-bold text-indigo-700">{inCart.quantity}</span>
-                <motion.button
-                  whileTap={{ scale: 0.85 }}
-                  onClick={() => onIncrement(product._id)}
-                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white hover:shadow-sm text-indigo-600 font-bold transition-all text-lg leading-none"
+                <span className="w-5 text-center text-[11px] font-bold text-indigo-700">{inCart.quantity}</span>
+                <motion.button whileTap={{ scale: 0.8 }} onClick={(e) => { e.stopPropagation(); onIncrement(product._id); }}
+                  className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white text-indigo-600 font-bold text-base leading-none"
                 >+</motion.button>
               </motion.div>
             ) : (
@@ -161,31 +185,17 @@ function ProductCard({ product, inCart, onAdd, onIncrement, onDecrement, index }
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.95 }}
+                whileTap={{ scale: 0.92 }}
                 onClick={handleAdd}
-                className="relative overflow-hidden bg-slate-900 text-white text-[12px] font-semibold px-5 py-2.5 rounded-full hover:bg-indigo-600 transition-colors duration-200"
-                style={{ boxShadow: justAdded ? "0 0 0 3px rgba(99,102,241,0.3)" : "none" }}
+                className="bg-slate-900 text-white text-[10px] font-semibold px-3 py-1.5 rounded-full hover:bg-indigo-600 transition-colors duration-200 flex items-center gap-1"
               >
                 <AnimatePresence mode="wait">
                   {justAdded ? (
-                    <motion.span
-                      key="added"
-                      initial={{ y: 10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -10, opacity: 0 }}
-                      className="flex items-center gap-1.5"
-                    >
+                    <motion.span key="added" initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }} className="flex items-center gap-1">
                       <CheckIcon /> Added
                     </motion.span>
                   ) : (
-                    <motion.span
-                      key="add"
-                      initial={{ y: 10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -10, opacity: 0 }}
-                      className="flex items-center gap-1.5"
-                    >
+                    <motion.span key="add" initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }} className="flex items-center gap-1">
                       <CartIcon /> Add
                     </motion.span>
                   )}
@@ -199,10 +209,135 @@ function ProductCard({ product, inCart, onAdd, onIncrement, onDecrement, index }
   );
 }
 
+// ── Hero Banner ──
+function HeroBanner({ user }) {
+  const [current, setCurrent] = useState(0);
+  const totalSlides = heroSlides.length;
+
+  useEffect(() => {
+    const t = setInterval(() => setCurrent(c => (c + 1) % totalSlides), 4000);
+    return () => clearInterval(t);
+  }, []);
+
+  const slide = heroSlides[current];
+  const greeting = user?.name
+    ? `Hi, ${user.name.split(" ")[0]} 👋`
+    : "Welcome 👋";
+
+  return (
+    <div>
+      {/* Mobile top bar */}
+      <div className="sm:hidden flex items-center justify-between px-4 pt-3 pb-2">
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-100 text-slate-500">
+          <CameraIcon />
+        </div>
+        <div className="flex-1 mx-3 relative">
+          <div className="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
+            <SearchIcon />
+          </div>
+          <input
+            type="text"
+            placeholder="Search"
+            className="w-full bg-slate-100 rounded-full py-2.5 pl-9 pr-4 text-[13px] text-slate-700 placeholder:text-slate-400 outline-none border-none"
+          />
+        </div>
+        <button className="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-100 text-slate-500 relative">
+          <BellIcon />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full border-2 border-white" />
+        </button>
+      </div>
+
+      {/* Hero Slide */}
+      <div className="sm:hidden mx-4 mt-2 mb-1 rounded-3xl overflow-hidden" style={{ height: 160 }}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current}
+            initial={{ opacity: 0, x: 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -60 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full h-full flex items-center justify-between px-6 relative"
+            style={{ background: slide.bg }}
+          >
+            <div className="z-10">
+              <h2 className="text-white text-[18px] font-black leading-tight mb-1">{slide.title}</h2>
+              <p className="text-white/70 text-[11px] leading-snug mb-3 whitespace-pre-line">{slide.subtitle}</p>
+              <button
+                className="text-[11px] font-bold px-4 py-2 rounded-full"
+                style={{ background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)" }}
+              >
+                {slide.btn}
+              </button>
+            </div>
+            {/* Decorative circle */}
+            <div
+              className="absolute right-0 top-0 bottom-0 w-36 flex items-center justify-end pr-4"
+              style={{
+                background: "radial-gradient(circle at 80% 50%, rgba(255,255,255,0.12) 0%, transparent 70%)"
+              }}
+            >
+              <div className="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-white/10" />
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Dots */}
+      <div className="sm:hidden flex items-center justify-center gap-1.5 mt-2.5 mb-1">
+        {heroSlides.map((_, i) => (
+          <button key={i} onClick={() => setCurrent(i)}>
+            <motion.div
+              animate={{ width: current === i ? 20 : 6, background: current === i ? "#4f46e5" : "#cbd5e1" }}
+              transition={{ duration: 0.3 }}
+              className="h-1.5 rounded-full"
+            />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Categories Section ──
+function CategoriesSection({ onFilter, activeCategory }) {
+  return (
+    <div className="sm:hidden px-4 mt-4">
+      <h2 className="text-[16px] font-bold text-slate-900 mb-3">Categories</h2>
+      <div className="grid grid-cols-3 gap-3">
+        {categories.map(({ label, emoji, color }) => (
+          <motion.button
+            key={label}
+            whileTap={{ scale: 0.93 }}
+            onClick={() => onFilter(label === activeCategory ? null : label)}
+            className="flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all duration-200"
+            style={{
+              background: activeCategory === label ? "#eef2ff" : color,
+              borderColor: activeCategory === label ? "#c7d2fe" : "transparent",
+            }}
+          >
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+              style={{ background: "rgba(255,255,255,0.7)" }}
+            >
+              {emoji}
+            </div>
+            <span className="text-[11px] font-semibold text-slate-700">{label}</span>
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Main Content ──
 export default function Content() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { cart, setCart } = useContext(AppContext);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const { cart, setCart, user } = useContext(AppContext);
   const API_URL = import.meta.env.VITE_API_URL;
   const headerRef = useRef(null);
 
@@ -210,7 +345,7 @@ export default function Content() {
     try {
       const [res] = await Promise.all([
         axios.get(`${API_URL}/products`),
-        new Promise(resolve => setTimeout(resolve, 800)) // ensure skeleton is visible for smoothness
+        new Promise(resolve => setTimeout(resolve, 700)),
       ]);
       setProducts(res.data);
     } catch (err) {
@@ -220,11 +355,9 @@ export default function Content() {
     }
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  useEffect(() => { fetchProducts(); }, []);
 
-  // GSAP header entrance
+  // GSAP header entrance (desktop only)
   useEffect(() => {
     if (!loading && headerRef.current) {
       gsap.fromTo(headerRef.current.children,
@@ -239,63 +372,174 @@ export default function Content() {
   const decrement    = (id) => setCart(cart.map(i => i._id === id ? { ...i, quantity: i.quantity - 1 } : i).filter(i => i.quantity > 0));
   const getItem      = (id) => cart.find(i => i._id === id);
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  // Category filtering (simple keyword match)
+  const categoryMap = {
+    Mobile: ["phone", "iphone", "mobile", "samsung", "pixel"],
+    Headphone: ["headphone", "earphone", "airpods", "earbud", "audio"],
+    Tablets: ["tablet", "ipad", "tab"],
+    Laptop: ["laptop", "macbook", "notebook", "computer"],
+    Speakers: ["speaker", "soundbar", "sonos"],
+  };
 
-      {/* Header */}
-      <div ref={headerRef} className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
-        <div>
-          <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-[0.25em] mb-2">Curated For You</p>
-          <h1 className="text-[32px] font-bold text-slate-900 tracking-[-0.02em] leading-tight">
-            Featured Collection
-          </h1>
-          <p className="text-slate-400 text-[13px] mt-1 font-normal">
-            Premium technology and goods, hand-picked.
-          </p>
+  const filteredProducts = activeCategory
+    ? products.filter(p => {
+        const keywords = categoryMap[activeCategory] || [];
+        const text = (p.name + " " + (p.desc || "")).toLowerCase();
+        return keywords.some(k => text.includes(k));
+      })
+    : products;
+
+  // Flash deals: pick first 6 products
+  const flashDeals = products.slice(0, 6);
+
+  return (
+    <>
+      {/* ── MOBILE LAYOUT ── */}
+      <div className="sm:hidden pb-28">
+        <HeroBanner user={user} />
+        <CategoriesSection onFilter={setActiveCategory} activeCategory={activeCategory} />
+
+        {/* Flash Deals */}
+        <div className="mt-6 px-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[16px] font-bold text-slate-900">Flash Deals for You</h2>
+            <button className="text-[12px] font-semibold text-indigo-600 flex items-center gap-0.5 hover:text-indigo-700">
+              See All <ChevronRight />
+            </button>
+          </div>
+
+          {loading ? (
+            <div className="flex gap-3 overflow-x-auto pb-2 -mr-4 pr-4" style={{ scrollbarWidth: "none" }}>
+              {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
+            </div>
+          ) : (
+            <div className="flex gap-3 overflow-x-auto pb-2 -mr-4 pr-4" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+              {flashDeals.map((product, i) => (
+                <div key={product._id} className="flex-shrink-0 w-44">
+                  <ProductCard
+                    product={product}
+                    index={i}
+                    inCart={getItem(product._id)}
+                    onAdd={addToCart}
+                    onIncrement={increment}
+                    onDecrement={decrement}
+                    onDetail={setSelectedProduct}
+                    API_URL={API_URL}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="text-[12px] font-medium text-slate-400 bg-slate-50 border border-slate-100 px-4 py-2 rounded-full"
-        >
-          Showing {loading ? "…" : products.length} products
-        </motion.div>
+
+        {/* All Products grid on mobile */}
+        <div className="mt-6 px-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[16px] font-bold text-slate-900">
+              {activeCategory ? `${activeCategory} Products` : "All Products"}
+            </h2>
+            {activeCategory && (
+              <button onClick={() => setActiveCategory(null)} className="text-[11px] font-semibold text-slate-400 hover:text-indigo-600">
+                Clear ✕
+              </button>
+            )}
+          </div>
+          {loading ? (
+            <div className="grid grid-cols-2 gap-3">
+              {[1, 2, 3, 4].map(i => <SkeletonCard key={i} />)}
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
+              <p className="text-slate-400 text-[13px]">No products in this category.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {filteredProducts.map((product, i) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  index={i}
+                  inCart={getItem(product._id)}
+                  onAdd={addToCart}
+                  onIncrement={increment}
+                  onDecrement={decrement}
+                  onDetail={setSelectedProduct}
+                  API_URL={API_URL}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
-        </div>
-      ) : products.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center py-32 bg-white rounded-3xl border border-dashed border-slate-200"
-        >
-          <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-            </svg>
+      {/* ── DESKTOP LAYOUT (unchanged) ── */}
+      <div className="hidden sm:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div ref={headerRef} className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+          <div>
+            <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-[0.25em] mb-2">Curated For You</p>
+            <h1 className="text-[32px] font-bold text-slate-900 tracking-[-0.02em] leading-tight">Featured Collection</h1>
+            <p className="text-slate-400 text-[13px] mt-1 font-normal">Premium technology and goods, hand-picked.</p>
           </div>
-          <p className="text-slate-400 text-[13px] font-medium">No products found in our inventory.</p>
-        </motion.div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product, i) => (
-            <ProductCard
-              key={product._id}
-              product={product}
-              index={i}
-              inCart={getItem(product._id)}
-              onAdd={addToCart}
-              onIncrement={increment}
-              onDecrement={decrement}
-            />
-          ))}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-[12px] font-medium text-slate-400 bg-slate-50 border border-slate-100 px-4 py-2 rounded-full"
+          >
+            Showing {loading ? "…" : products.length} products
+          </motion.div>
         </div>
-      )}
-    </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl border border-slate-100 overflow-hidden" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+                <div style={{ aspectRatio: "1/1" }}><Skeleton height="100%" borderRadius={0} /></div>
+                <div className="p-5">
+                  <Skeleton width="30%" height={10} className="mb-3" />
+                  <Skeleton width="90%" height={14} className="mb-1" />
+                  <Skeleton width="65%" height={14} className="mb-4" />
+                  <div className="flex justify-between items-center mt-4">
+                    <div><Skeleton width={40} height={10} className="mb-1 block" /><Skeleton width={60} height={18} /></div>
+                    <Skeleton width={90} height={34} borderRadius={9999} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : products.length === 0 ? (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-32 bg-white rounded-3xl border border-dashed border-slate-200">
+            <p className="text-slate-400 text-[13px] font-medium">No products found in our inventory.</p>
+          </motion.div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((product, i) => (
+              <ProductCard
+                key={product._id}
+                product={product}
+                index={i}
+                inCart={getItem(product._id)}
+                onAdd={addToCart}
+                onIncrement={increment}
+                onDecrement={decrement}
+                onDetail={setSelectedProduct}
+                API_URL={API_URL}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Product Detail Modal */}
+      <AnimatePresence>
+        {selectedProduct && (
+          <ProductDetailModal
+            product={selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+            API_URL={API_URL}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
