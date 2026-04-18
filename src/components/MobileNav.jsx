@@ -195,7 +195,7 @@ export default function MobileNav() {
             </Link>
           );
         })}
-      </motion.div>
+      </div>
     </div>
   );
 }
