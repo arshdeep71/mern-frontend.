@@ -11,31 +11,24 @@
   }
 
   /* ── Fullscreen PWA root ── */
-  html, body, #root {
-    height: 100%;
-    /* Use dynamic viewport height — accounts for browser chrome appearing/disappearing */
-    min-height: 100dvh;
-    overscroll-behavior: none; /* Prevent pull-to-refresh & bounce */
-  }
-
-  /* Prevent iOS rubber-band scroll on the html element */
   html {
-    overflow: hidden;
     height: 100%;
-  }
-
-  body {
-    overflow-y: auto;
-    height: 100%;
-  }
-
-  body {
-    @apply font-sans antialiased text-slate-900;
+    height: -webkit-fill-available;
+    /* This ensures the color bleeds even into the "overscroll" and "safe area" zones */
     background-color: #F0F2F7;
-    background-image:
+    background-image: 
       radial-gradient(ellipse 90% 60% at 10% 0%, rgba(99,102,241,0.08) 0%, transparent 60%),
       radial-gradient(ellipse 70% 80% at 90% 100%, rgba(168,85,247,0.06) 0%, transparent 60%);
     background-attachment: fixed;
+    overflow-x: hidden;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-y: auto;
+    overflow-x: hidden;
+    @apply font-sans antialiased text-slate-900;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

@@ -3,7 +3,7 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { AppContext } from "../App";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ── Icons (filled + outline variants) ──
+// ── Icons (outline + filled variants for active state) ──
 const icons = {
   Home: {
     outline: (
@@ -96,31 +96,36 @@ export default function MobileNav() {
     { label: "Home",     path: "/",         key: "Home" },
     { label: "Chat",     path: "/chat",     key: "Chat" },
     { label: "Wishlist", path: "/wishlist", key: "Wishlist" },
-    { label: "Cart",     path: "/cart",     key: "Cart", badge: cart.length },
+    { label: "Cart",     path: "/cart",     key: "Cart",    badge: cart.length },
     { label: "Profile",  path: user?.email ? "/profile" : "/login", key: "Profile" },
   ];
 
   return (
     /**
-     * Full-width frosted glass bar — extends from pill to physical screen bottom.
-     * This is how iOS native tab bars work: the material fills the entire
-     * safe-area zone (home indicator area). No floating, no gap, no bad strip.
+     * Floating Pill Navigation — Transparent container allows content bleed
      */
     <div
-      className="sm:hidden fixed bottom-0 left-0 right-0 z-50"
+      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none"
       style={{
-        /* Full-bleed frosted glass — covers content + safe-area zone */
-        backdropFilter: "blur(24px) saturate(180%) brightness(1.05)",
-        WebkitBackdropFilter: "blur(24px) saturate(180%) brightness(1.05)",
-        background: "rgba(248, 248, 252, 0.88)",
-        /* Top hairline border */
-        borderTop: "0.5px solid rgba(0,0,0,0.10)",
-        /* Extend content area below safe area using padding-bottom */
-        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        /* Floating position above the home indicator */
+        paddingBottom: "max(env(safe-area-inset-bottom, 0px), 12px)",
       }}
     >
-      {/* Tab row */}
-      <div className="flex items-center justify-around px-2 py-1">
+      {/* ── Liquid Glass Floating Pill ── */}
+      <motion.div
+        animate={scrolled ? { scale: 0.88, opacity: 0.85 } : { scale: 1, opacity: 1 }}
+        transition={{ type: "spring", damping: 28, stiffness: 320 }}
+        className="pointer-events-auto relative shadow-2xl flex items-center px-1.5 py-1.5 gap-0.5"
+        style={{
+          /* Liquid Glass Material */
+          background: "rgba(255, 255, 255, 0.85)",
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
+          borderRadius: "999px",
+          border: "1px solid rgba(255, 255, 255, 0.4)",
+          boxShadow: "0 8px 32px -4px rgba(0,0,0,0.1), 0 4px 12px -2px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.8)",
+        }}
+      >
         {tabs.map(({ label, path, key, badge }) => {
           const active =
             location.pathname === path ||
@@ -131,84 +136,79 @@ export default function MobileNav() {
             <Link
               key={key}
               to={path}
-              className="relative flex flex-col items-center justify-center py-2 px-3 rounded-2xl transition-all select-none"
-              style={{ WebkitTapHighlightColor: "transparent", outline: "none", minWidth: 56 }}
+              className="relative flex flex-col items-center justify-center transition-all select-none"
+              style={{
+                WebkitTapHighlightColor: "transparent",
+                outline: "none",
+                minWidth: scrolled ? "50px" : "64px",
+              }}
             >
-              {/* Active indicator background */}
-              <AnimatePresence>
-                {active && (
-                  <motion.div
-                    layoutId="tab-active-bg"
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.85 }}
-                    transition={{ type: "spring", damping: 26, stiffness: 400 }}
-                    className="absolute inset-0 rounded-2xl"
-                    style={{
-                      background: "rgba(79, 70, 229, 0.10)",
-                    }}
-                  />
-                )}
-              </AnimatePresence>
-
-              {/* Icon */}
-              <div className="relative">
-                <motion.div
-                  animate={{
-                    color: active ? "#4f46e5" : "rgba(100,100,120,0.7)",
-                    scale: active ? 1.08 : 1,
-                  }}
-                  transition={{ type: "spring", damping: 20, stiffness: 380 }}
-                >
-                  {active ? Icon.filled : Icon.outline}
-                </motion.div>
-
-                {/* Badge */}
+              <motion.div
+                layout
+                className="relative flex flex-col items-center justify-center py-2 px-1 rounded-full"
+                transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              >
+                {/* Active state pill background */}
                 <AnimatePresence>
-                  {badge > 0 && (
+                  {active && (
+                    <motion.div
+                      layoutId="active-pill-bg"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="absolute inset-x-0 inset-y-0 bg-indigo-50/80 rounded-full -z-10"
+                    />
+                  )}
+                </AnimatePresence>
+
+                {/* Icon */}
+                <div className="relative">
+                  <motion.div
+                    animate={{
+                      color: active ? "#4f46e5" : "rgba(60,60,67,0.6)",
+                      scale: active ? 1.05 : 1,
+                    }}
+                  >
+                    {active ? Icon.filled : Icon.outline}
+                  </motion.div>
+
+                  {/* Badge */}
+                  <AnimatePresence>
+                    {badge > 0 && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        className="absolute -top-1 -right-1 text-[9px] font-black text-white bg-red-500 min-w-[15px] h-3.5 rounded-full flex items-center justify-center border-2 border-white"
+                      >
+                        {badge > 9 ? "9+" : badge}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Label (collapses on scroll) */}
+                <AnimatePresence>
+                  {!scrolled && (
                     <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      transition={{ type: "spring", damping: 18, stiffness: 500 }}
-                      className="absolute -top-1 -right-1.5 min-w-[16px] h-4 rounded-full flex items-center justify-center text-white font-black border-2 border-white"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="text-[10px] whitespace-nowrap overflow-hidden mt-0.5"
                       style={{
-                        fontSize: 9,
-                        background: "#ff3b30",
-                        paddingLeft: badge > 9 ? 3 : 0,
-                        paddingRight: badge > 9 ? 3 : 0,
+                        fontWeight: active ? 700 : 500,
+                        color: active ? "#4f46e5" : "rgba(60,60,67,0.6)",
                       }}
                     >
-                      {badge > 9 ? "9+" : badge}
+                      {label}
                     </motion.span>
                   )}
                 </AnimatePresence>
-              </div>
-
-              {/* Label */}
-              <AnimatePresence>
-                {!scrolled && (
-                  <motion.span
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ type: "spring", damping: 26, stiffness: 320 }}
-                    className="overflow-hidden whitespace-nowrap mt-0.5"
-                    style={{
-                      fontSize: 10,
-                      fontWeight: active ? 700 : 500,
-                      color: active ? "#4f46e5" : "rgba(100,100,120,0.7)",
-                      letterSpacing: "0.01em",
-                    }}
-                  >
-                    {label}
-                  </motion.span>
-                )}
-              </AnimatePresence>
+              </motion.div>
             </Link>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
 }
