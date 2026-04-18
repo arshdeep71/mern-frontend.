@@ -255,7 +255,7 @@ export default function Cart() {
   return (
     <>
       {/* ───── MOBILE CART ───── */}
-      <div className="sm:hidden min-h-screen bg-white pb-36">
+      <div className="sm:hidden min-h-[100dvh] bg-[#F0F2F7] pb-36">
         {/* Mobile Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-slate-100">
           <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
@@ -328,8 +328,14 @@ export default function Cart() {
           </div>
         </div>
 
-        {/* Checkout CTA (fixed at bottom) */}
-        <div className="fixed bottom-0 left-0 right-0 px-4 py-4 bg-white border-t border-slate-100 z-40" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}>
+        {/* Checkout CTA — sits above MobileNav floating pill */}
+        <div
+          className="fixed left-0 right-0 px-4 pt-3 bg-[#F0F2F7] z-40"
+          style={{
+            bottom: 0,
+            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 88px)",
+          }}
+        >
           {/* Also show bottom nav safe space */}
           <div className="sm:hidden h-14" style={{ display: "none" }} />
           <motion.button
