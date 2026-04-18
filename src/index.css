@@ -10,22 +10,32 @@
     box-sizing: border-box;
   }
 
-  /* ── THE DEFINITIVE SAFARI FULLSCREEN FIX ── */
+  /* ── INTERACTIVE VIEWPORT FIX (Nixon-style) ── */
+  :root {
+    /* Define the real dynamic viewport height */
+    --app-height: 100svh;
+  }
+
   html {
-    /* Fixed background on HTML is the ONLY way to bleed color behind Safari bars forever */
-    background: #F4F6FB fixed !important;
-    height: 100%;
+    background-color: #F4F6FB !important;
+    /* Don't lock height — let Safari UI resize naturally */
+    min-height: 100%;
     margin: 0;
     padding: 0;
   }
 
   body {
-    /* Allow the body to grow naturally but start at full height */
-    min-height: 101%; 
+    background-color: #F4F6FB !important;
     margin: 0;
     padding: 0;
+    
+    /* These properties let the content bleed but keep scroll fluid */
+    min-height: 100svh;
     overflow-x: hidden;
-    background: transparent !important; /* Let the HTML background show through */
+    overflow-y: auto;
+    
+    /* Bleed padding into the safe area so content reaches the physical bottom */
+    padding-bottom: env(safe-area-inset-bottom, 20px);
     
     @apply font-sans antialiased text-slate-900;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -34,9 +44,9 @@
   }
 
   #root {
-    /* Ensure the root doesn't trap the background */
-    min-height: 100%;
-    background: transparent !important;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
   }
 
   /* ── iOS Safari anti-zoom fix ──
