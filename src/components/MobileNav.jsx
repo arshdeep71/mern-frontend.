@@ -1,9 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { AppContext } from "../App";
 import { motion, AnimatePresence } from "framer-motion";
+import { gsap } from "gsap";
 
-// ── Icons (outline + filled variants for active state) ──
 const icons = {
   Home: {
     outline: (
@@ -74,19 +74,46 @@ const icons = {
 export default function MobileNav() {
   const location = useLocation();
   const { cart, user } = useContext(AppContext);
-  const [scrolled, setScrolled] = useState(false);
+  
+  // 🔥 Refs for performance (avoiding re-renders)
+  const navRef = useRef(null);
   const scrollTimer = useRef(null);
+  const isCurrentlyHidden = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(true);
-      clearTimeout(scrollTimer.current);
-      scrollTimer.current = setTimeout(() => setScrolled(false), 700);
+      // 1. Detect scroll START: Hide if not already hiding
+      if (!isCurrentlyHidden.current) {
+        isCurrentlyHidden.current = true;
+        gsap.to(navRef.current, {
+          opacity: 0,
+          y: 40,
+          duration: 0.25,
+          ease: "power2.out",
+          overwrite: true
+        });
+      }
+
+      // 2. Clear previous stop-detection timer
+      if (scrollTimer.current) clearTimeout(scrollTimer.current);
+
+      // 3. Set new timer to detect scroll STOP (debounce ~200ms)
+      scrollTimer.current = setTimeout(() => {
+        isCurrentlyHidden.current = false;
+        gsap.to(navRef.current, {
+          opacity: 1,
+          y: 0,
+          duration: 0.35,
+          ease: "power3.out",
+          overwrite: true
+        });
+      }, 200);
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      clearTimeout(scrollTimer.current);
+      if (scrollTimer.current) clearTimeout(scrollTimer.current);
     };
   }, []);
 
@@ -101,23 +128,19 @@ export default function MobileNav() {
   ];
 
   return (
-    /**
-     * 🔥 STEP 5 — FLOATING NAVBAR (NOT ATTACHED)
-     * Keeps the premium pill look while floating precisely.
-     */
     <div
-      className="sm:hidden fixed z-50 pointer-events-none"
+      ref={navRef}
+      className="sm:hidden fixed z-[100] pointer-events-none"
       style={{
         bottom: "calc(env(safe-area-inset-bottom, 0px) + 20px)",
         left: "50%",
         transform: "translateX(-50%)",
         width: "max-content",
+        willChange: "transform, opacity"
       }}
     >
       {/* ── Liquid Glass Floating Pill ── */}
-      <motion.div
-        animate={scrolled ? { scale: 0.88, opacity: 0.85 } : { scale: 1, opacity: 1 }}
-        transition={{ type: "spring", damping: 28, stiffness: 320 }}
+      <div
         className="pointer-events-auto shadow-2xl flex items-center px-1.5 py-1.5 gap-0.5"
         style={{
           background: "rgba(255, 255, 255, 0.85)",
@@ -142,14 +165,11 @@ export default function MobileNav() {
               style={{
                 WebkitTapHighlightColor: "transparent",
                 outline: "none",
-                minWidth: scrolled ? "50px" : "64px",
+                minWidth: "64px",
               }}
             >
-              <motion.div
-                layout
-                className="relative flex flex-col items-center justify-center py-2 px-1 rounded-full"
-                transition={{ type: "spring", damping: 25, stiffness: 350 }}
-              >
+              <div className="relative flex flex-col items-center justify-center py-2 px-1 rounded-full">
+                {/* Active state pill background */}
                 <AnimatePresence>
                   {active && (
                     <motion.div
@@ -162,16 +182,13 @@ export default function MobileNav() {
                   )}
                 </AnimatePresence>
 
+                {/* Icon */}
                 <div className="relative">
-                  <motion.div
-                    animate={{
-                      color: active ? "#4f46e5" : "rgba(60,60,67,0.6)",
-                      scale: active ? 1.05 : 1,
-                    }}
-                  >
+                  <div style={{ color: active ? "#4f46e5" : "rgba(60,60,67,0.6)" }}>
                     {active ? Icon.filled : Icon.outline}
-                  </motion.div>
+                  </div>
 
+                  {/* Badge */}
                   <AnimatePresence>
                     {badge > 0 && (
                       <motion.span
@@ -186,27 +203,21 @@ export default function MobileNav() {
                   </AnimatePresence>
                 </div>
 
-                <AnimatePresence>
-                  {!scrolled && (
-                    <motion.span
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="text-[10px] whitespace-nowrap overflow-hidden mt-0.5"
-                      style={{
-                        fontWeight: active ? 700 : 500,
-                        color: active ? "#4f46e5" : "rgba(60,60,67,0.6)",
-                      }}
-                    >
-                      {label}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
+                {/* Label */}
+                <span
+                  className="text-[10px] whitespace-nowrap overflow-hidden mt-0.5"
+                  style={{
+                    fontWeight: active ? 700 : 500,
+                    color: active ? "#4f46e5" : "rgba(60,60,67,0.6)",
+                  }}
+                >
+                  {label}
+                </span>
+              </div>
             </Link>
           );
         })}
-      </motion.div>
+      </div>
     </div>
   );
 }
