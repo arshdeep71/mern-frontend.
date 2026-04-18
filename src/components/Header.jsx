@@ -8,6 +8,7 @@ export default function Header() {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [promoIndex, setPromoIndex] = useState(0);
 
   const announcements = [
@@ -71,29 +72,33 @@ export default function Header() {
         }`}
       >
         <div className="h-16 px-5 flex items-center justify-between max-w-7xl mx-auto">
-          {/* Menu Button */}
-          <button 
-            onClick={() => setIsMenuOpen(true)}
-            className="w-10 h-10 flex items-center justify-start text-slate-800"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
+          {/* Menu Button (Left) */}
+          <div className="w-20 md:w-auto flex justify-start">
+            <button 
+              onClick={() => setIsMenuOpen(true)}
+              className="w-10 h-10 flex items-center justify-start text-slate-800"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+          </div>
 
           {/* Centered Premium Logo */}
           <Link to="/" className="flex-1 text-center">
-            <span className="text-lg font-bold tracking-[0.25em] text-slate-900 uppercase">
+            <span className="text-xl font-bold tracking-[0.25em] text-slate-900 uppercase">
               MYSTORE
             </span>
           </Link>
 
-          {/* Right Actions */}
-          <div className="flex items-center justify-end gap-4 w-10">
-            <button className="hidden sm:block">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          {/* Right Actions (Icons on Right) */}
+          <div className="w-20 md:w-auto flex items-center justify-end gap-3 md:gap-4">
+            <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="p-1">
+              <svg className="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </button>
             <Link to="/cart" className="relative group p-1">
               <svg className="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,6 +112,35 @@ export default function Header() {
             </Link>
           </div>
         </div>
+
+        {/* Dynamic Search Overlay */}
+        <AnimatePresence>
+          {isSearchOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="bg-white border-b border-slate-100 overflow-hidden"
+            >
+              <div className="p-4 relative">
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="What are you looking for?"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-12 pl-12 pr-12 bg-slate-50 rounded-xl border-none outline-none text-sm"
+                />
+                <svg className="absolute left-8 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <button onClick={() => setIsSearchOpen(false)} className="absolute right-8 top-1/2 -translate-y-1/2 text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* ── 2. MOBILE SIDE MENU (Nixon Style) ── */}
