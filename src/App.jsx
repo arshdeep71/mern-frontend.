@@ -108,7 +108,7 @@ function LoadingFallback() {
 
 function LayoutWrapper({ user, setUser, cart, setCart }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-[#F4F6FB]">
       <ConditionalHeader />
       <main className="flex-1 flex flex-col">
         <Suspense fallback={<LoadingFallback />}>
