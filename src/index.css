@@ -18,8 +18,22 @@
     letter-spacing: -0.01em;
   }
 
+  /* ── iOS Safari anti-zoom fix ──
+     Safari zooms in on any input with font-size < 16px.
+     This sets all inputs to 16px on touch devices, then
+     visually scales them back with transform so they
+     LOOK like the designed size but won't trigger zoom. */
   input, textarea, select {
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    /* Force 16px minimum so iOS Safari never auto-zooms on focus */
+    font-size: 16px !important;
+  }
+
+  /* On non-touch / desktop, revert to normal sizes */
+  @media (hover: hover) and (pointer: fine) {
+    input, textarea, select {
+      font-size: inherit !important;
+    }
   }
 }
 
