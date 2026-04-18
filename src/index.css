@@ -10,31 +10,22 @@
     box-sizing: border-box;
   }
 
-  /* ── Fullscreen PWA / Safari Root ── */
+  /* ── THE DEFINITIVE SAFARI FULLSCREEN FIX ── */
   html {
-    /* Force 0.5% extra height to ensure Safari "feels" the scroll and hides the UI */
-    min-height: 100.5%;
-    background-color: #F4F6FB !important;
-    scroll-behavior: smooth;
-  }
-
-  /* Pro-trick: This ensures the color stays behind Safari's bars during resize */
-  html::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+    /* Fixed background on HTML is the ONLY way to bleed color behind Safari bars forever */
+    background: #F4F6FB fixed !important;
     height: 100%;
-    background-color: #F4F6FB;
-    z-index: -100;
+    margin: 0;
+    padding: 0;
   }
 
   body {
-    background-color: #F4F6FB !important;
+    /* Allow the body to grow naturally but start at full height */
+    min-height: 101%; 
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    background: transparent !important; /* Let the HTML background show through */
     
     @apply font-sans antialiased text-slate-900;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -43,8 +34,9 @@
   }
 
   #root {
+    /* Ensure the root doesn't trap the background */
     min-height: 100%;
-    background-color: #F4F6FB;
+    background: transparent !important;
   }
 
   /* ── iOS Safari anti-zoom fix ──
