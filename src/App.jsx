@@ -20,6 +20,7 @@ const Register = lazy(() => import("./components/Register"));
 const Cart = lazy(() => import("./components/Cart"));
 const Orders = lazy(() => import("./components/Orders"));
 const Profile = lazy(() => import("./components/Profile"));
+const ChatPage = lazy(() => import("./components/ChatPage"));
 
 export const AppContext = createContext();
 
@@ -116,6 +117,7 @@ function LayoutWrapper({ user, setUser, cart, setCart }) {
             <Route path="cart" element={<Cart />} />
             <Route path="orders" element={<Orders />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="chat" element={<ChatPage />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="logout" element={<Logout />} />
