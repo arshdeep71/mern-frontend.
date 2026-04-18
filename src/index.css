@@ -58,14 +58,14 @@
   .app-container::after {
     content: "";
     display: block;
-    height: 180px; 
+    height: 220px; /* Taller spacer for floating pill */
     background: #F4F6FB;
   }
 
   /* 🔥 STEP 5 — FIX MAIN CONTENT */
   .main-content {
     flex: 1;
-    padding-bottom: 20px; /* Space for content breathing */
+    padding-bottom: 20px;
   }
 
   /* ── iOS Safari anti-zoom fix ── */
