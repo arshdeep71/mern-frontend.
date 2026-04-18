@@ -328,12 +328,12 @@ export default function Cart() {
           </div>
         </div>
 
-        {/* Checkout CTA — sits above MobileNav floating pill */}
+        {/* Checkout CTA — sits above MobileNav tab bar */}
         <div
           className="fixed left-0 right-0 px-4 pt-3 bg-[#F0F2F7] z-40"
           style={{
             bottom: 0,
-            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 88px)",
+            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 70px)",
           }}
         >
           {/* Also show bottom nav safe space */}
