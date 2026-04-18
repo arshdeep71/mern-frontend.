@@ -108,7 +108,9 @@ function LoadingFallback() {
 
 function LayoutWrapper({ user, setUser, cart, setCart }) {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    // min-h-[100dvh] = fills the entire physical screen including behind home bar
+    // No bg color here — let body/html background bleed to the absolute bottom edge
+    <div className="min-h-[100dvh] flex flex-col">
       <ConditionalHeader />
       <main className="flex-1 flex flex-col">
         <Suspense fallback={<LoadingFallback />}>

@@ -103,9 +103,9 @@ export default function MobileNav() {
   ];
 
   return (
+    /* Outer shell: fixed to the PHYSICAL bottom edge — no padding, no gap */
     <div
-      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 flex items-end justify-center pointer-events-none"
-      style={{ paddingBottom: "max(env(safe-area-inset-bottom, 0px), 12px)" }}
+      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none"
     >
       {/* ── Liquid Glass Floating Pill ── */}
       <motion.div
@@ -113,6 +113,8 @@ export default function MobileNav() {
         transition={{ type: "spring", damping: 28, stiffness: 320 }}
         className="pointer-events-auto relative"
         style={{
+          /* Push the pill up above the home indicator */
+          marginBottom: "max(env(safe-area-inset-bottom, 0px), 10px)",
           /* Liquid Glass base */
           background: "rgba(255, 255, 255, 0.18)",
           backdropFilter: "blur(40px) saturate(200%) brightness(1.1)",
@@ -246,6 +248,18 @@ export default function MobileNav() {
           })}
         </div>
       </motion.div>
+
+      {/* ── Bottom bleed strip ──
+          Fills the zone between the pill and the physical screen edge (under home bar).
+          Uses the same background color as the page so there's no visible gap. */}
+      <div
+        className="pointer-events-none w-full"
+        style={{
+          height: "env(safe-area-inset-bottom, 0px)",
+          background: "#F0F2F7",
+          marginTop: -1, /* 1px overlap to avoid sub-pixel gap */
+        }}
+      />
     </div>
   );
 }
