@@ -534,7 +534,7 @@ export default function Content() {
   return (
     <>
       {/* ── MOBILE LAYOUT ── */}
-      <div className="sm:hidden pb-28">
+      <div className="sm:hidden pb-36">
         <HeroBanner
           user={user}
           searchQuery={searchQuery}

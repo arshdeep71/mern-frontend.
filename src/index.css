@@ -11,7 +11,12 @@
   }
 
   body {
-    @apply font-sans antialiased text-slate-900 bg-[#F7F7F9];
+    @apply font-sans antialiased text-slate-900;
+    background-color: #F0F2F7;
+    background-image:
+      radial-gradient(ellipse 90% 60% at 10% 0%, rgba(99,102,241,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 80% at 90% 100%, rgba(168,85,247,0.06) 0%, transparent 60%);
+    background-attachment: fixed;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
