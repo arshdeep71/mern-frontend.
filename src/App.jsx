@@ -11,6 +11,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ChatWidget from "./components/ChatWidget";
 import MobileNav from "./components/MobileNav";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Lazy loaded route components for better performance
 const Content = lazy(() => import("./components/Content"));
@@ -96,6 +97,67 @@ function App() {
   );
 }
 
+function NewsletterPopup() {
+  const [show, setShow] = useState(false);
+  const [dismissed, setDismissed] = useState(sessionStorage.getItem("newsletter_dismissed"));
+
+  useEffect(() => {
+    if (dismissed) return;
+    const timer = setTimeout(() => setShow(true), 4000); 
+    return () => clearTimeout(timer);
+  }, [dismissed]);
+
+  const close = () => {
+    setShow(false);
+    sessionStorage.setItem("newsletter_dismissed", "true");
+    setDismissed("true");
+  };
+
+  return (
+    <AnimatePresence>
+      {show && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={close}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          />
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            className="relative w-full max-w-lg bg-white p-10 shadow-2xl overflow-hidden"
+          >
+            <button onClick={close} className="absolute top-4 right-4 text-slate-400 hover:text-black">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div className="text-center space-y-6">
+               <h2 className="text-3xl font-black text-slate-900 leading-tight">
+                 Before you go, subscribe to get <span className="text-indigo-600">10% OFF</span> your first order.
+               </h2>
+               <div className="space-y-4 pt-4">
+                 <input 
+                   type="email" 
+                   placeholder="Email" 
+                   className="w-full h-14 px-6 bg-slate-100 border-none rounded-sm text-lg focus:ring-2 focus:ring-black outline-none"
+                 />
+                 <button className="w-full h-14 bg-black text-white font-bold uppercase tracking-[0.2em] hover:bg-slate-800 transition-colors">
+                   Submit & continue
+                 </button>
+               </div>
+               <button onClick={close} className="text-slate-400 font-medium hover:text-black hover:underline transition-all">
+                 No thanks
+               </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // Global Skeleton Loader for Suspense Fallback
 function LoadingFallback() {
   return (
@@ -109,6 +171,7 @@ function LoadingFallback() {
 function LayoutWrapper({ user, setUser, cart, setCart }) {
   return (
     <div className="app-container">
+      <NewsletterPopup />
       <ConditionalHeader />
       <main className="main-content">
         <Suspense fallback={<LoadingFallback />}>
@@ -124,11 +187,7 @@ function LayoutWrapper({ user, setUser, cart, setCart }) {
           </Routes>
         </Suspense>
       </main>
-      {/* Desktop footer — hidden on mobile */}
-      <div className="hidden sm:block">
-        <ConditionalFooter />
-      </div>
-      {/* Mobile bottom nav */}
+      <ConditionalFooter />
       <MobileNav />
       <ChatWidget />
     </div>

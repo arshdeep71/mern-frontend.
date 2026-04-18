@@ -7,7 +7,21 @@ export default function Header() {
   const { cart, user, searchQuery, setSearchQuery } = useContext(AppContext);
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [promoIndex, setPromoIndex] = useState(0);
+
+  const announcements = [
+    "Free Shipping On Orders +$150. →",
+    "Shop Now, Pay Later with Afterpay →",
+    "Take Our Gift Finder Quiz →"
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPromoIndex((prev) => (prev + 1) % announcements.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -15,65 +29,53 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Check if we are on a page where we want a simple header
-  const isAuthPage = ["/login", "/register"].includes(location.pathname);
-  if (isAuthPage) return null;
+  if (["/login", "/register"].includes(location.pathname)) return null;
+
+  const menuItems = [
+    { label: "Watches", path: "/" },
+    { label: "Featured Collections", path: "/" },
+    { label: "Bands", path: "/" },
+    { label: "Headwear & More", path: "/" },
+    { label: "Gifts", path: "/" },
+  ];
 
   return (
-    <header
-      className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-300 ${
-        scrolled ? "bg-white/90 backdrop-blur-xl shadow-sm" : "bg-white"
-      }`}
-      style={{
-        paddingTop: "env(safe-area-inset-top, 0px)",
-      }}
-    >
-      {/* ── Desktop Header ── */}
-      <div className="hidden md:flex flex-col">
-        <div className="max-w-7xl mx-auto w-full h-20 px-6 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
-              <span className="font-black italic text-xl">M</span>
-            </div>
-            <span className="text-2xl font-black tracking-tighter text-slate-900">MYSTORE</span>
-          </Link>
+    <>
+      {/* ── 1. ANNOUNCEMENT BAR (Nixon Style) ── */}
+      <div className="bg-black text-white h-10 flex items-center justify-between px-4 overflow-hidden relative z-[110]">
+        <button onClick={() => setPromoIndex((p) => (p - 1 + announcements.length) % announcements.length)}>
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={promoIndex}
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="text-[10px] md:text-xs font-medium tracking-widest uppercase"
+          >
+            {announcements[promoIndex]}
+          </motion.div>
+        </AnimatePresence>
 
-          <div className="flex-1 max-w-lg mx-12">
-            <div className="relative group">
-              <input
-                type="text"
-                placeholder="Search premium tech..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-12 pl-12 pr-4 bg-slate-100 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all duration-300 text-slate-600 outline-none"
-              />
-              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <Link to="/notification" className="w-11 h-11 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all relative">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              <div className="absolute top-2.5 right-3 w-2 h-2 bg-indigo-600 border-2 border-white rounded-full"></div>
-            </Link>
-            <Link to="/cart" className="flex items-center gap-2 px-5 h-11 bg-slate-900 text-white rounded-xl hover:bg-indigo-600 transition-all shadow-md active:scale-95">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              <span className="font-bold">{cart.length}</span>
-            </Link>
-            <Link to={user?.email ? "/profile" : "/login"} className="w-11 h-11 rounded-full bg-indigo-100 border-2 border-indigo-200 flex items-center justify-center overflow-hidden active:scale-95 transition-all">
-              {user?.email ? <span className="text-indigo-700 font-bold uppercase">{user.email[0]}</span> : <svg className="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}
-            </Link>
-          </div>
-        </div>
+        <button onClick={() => setPromoIndex((p) => (p + 1) % announcements.length)}>
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
       </div>
 
-      {/* ── 🔥 NEW MOBILE HEADER (Nixon-Style) ── */}
-      <div className="md:hidden flex flex-col">
-        <div className="h-16 px-5 flex items-center justify-between border-b border-slate-100">
+      <header
+        className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-300 ${
+          scrolled ? "bg-white/90 backdrop-blur-xl shadow-sm" : "bg-white border-b border-slate-100"
+        }`}
+      >
+        <div className="h-16 px-5 flex items-center justify-between max-w-7xl mx-auto">
           {/* Menu Button */}
-          <button className="w-10 h-10 flex items-center justify-start text-slate-800">
+          <button 
+            onClick={() => setIsMenuOpen(true)}
+            className="w-10 h-10 flex items-center justify-start text-slate-800"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -89,43 +91,77 @@ export default function Header() {
           </Link>
 
           {/* Right Actions */}
-          <div className="flex items-center justify-end gap-3 w-10">
+          <div className="flex items-center justify-end gap-4 w-10">
+            <button className="hidden sm:block">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </button>
             <Link to="/cart" className="relative group p-1">
-              <svg className="w-6 h-6 text-slate-800 group-active:scale-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
-              <AnimatePresence>
-                {cart.length > 0 && (
-                  <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-indigo-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white"
-                  >
-                    {cart.length}
-                  </motion.span>
-                )}
-              </AnimatePresence>
+              {cart.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-indigo-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                  {cart.length}
+                </span>
+              )}
             </Link>
           </div>
         </div>
-        
-        {/* Simple Mobile Search Bar (Toggles for cleanliness) */}
-        <div className="px-5 py-2">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-4 bg-slate-50 rounded-xl border border-slate-200 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none"
+      </header>
+
+      {/* ── 2. MOBILE SIDE MENU (Nixon Style) ── */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[200]"
             />
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-        </div>
-      </div>
-    </header>
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 left-0 bottom-0 w-[85%] max-w-sm bg-white z-[201] flex flex-col pt-[env(safe-area-inset-top,0px)]"
+            >
+              <div className="p-5 flex items-center justify-between border-b border-slate-50">
+                <span className="text-xl font-bold uppercase tracking-widest">MYSTORE</span>
+                <button onClick={() => setIsMenuOpen(false)}>
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto">
+                <div className="flex flex-col">
+                  {menuItems.map((item, idx) => (
+                    <Link
+                      key={idx}
+                      to={item.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="p-5 flex items-center justify-between border-b border-slate-50 text-slate-800 hover:bg-slate-50"
+                    >
+                      <span className="font-medium text-lg">{item.label}</span>
+                      <svg className="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="p-8 mt-10 space-y-6 text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">🇮🇳 IN</span>
+                  </div>
+                  <Link to="/orders" className="block text-lg font-medium text-slate-800">Order Status</Link>
+                  <Link to="/" className="block text-lg font-medium text-slate-800">Find a Store</Link>
+                  <Link to="/login" className="block text-lg font-medium text-slate-800">Sign in</Link>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
